@@ -1,7 +1,8 @@
 (function () {
   "use strict";
 
-  const API = "https://norminternet-vapitow854.amvera.io";
+  // const API = "https://norminternet-vapitow854.amvera.io";
+  const API = "http://127.0.0.1:8080";
 
   const preview = document.getElementById("preview");
   const playback = document.getElementById("playback");
