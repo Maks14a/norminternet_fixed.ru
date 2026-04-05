@@ -434,4 +434,97 @@ async function uploadBlob(blob, mimeType, durationMs) {
     .catch(() => {
       setStatus("Откройте через HTTPS или localhost и разрешите камеру.", true);
     });
+
+
+  // --- КОНФИГ И ПЕРЕМЕННЫЕ АДМИНКИ ---
+    const adminConfig = {
+      isLocked: false,
+      lockMs: 15000,
+      endpoint: API + "/api/admin"
+    };
+
+    const adminDom = {
+      trigger: document.getElementById('adminTrigger'),
+      modal: document.getElementById('adminModal'),
+      input: document.getElementById('adminInput'),
+      loginBtn: document.getElementById('adminLoginBtn'),
+      panel: document.getElementById('adminPanel'),
+      authBox: document.getElementById('authBox'),
+      stats: document.getElementById('adminStatsBox'),
+      title: document.getElementById('adminTitle')
+    };
+
+    // Открытие/Закрытие
+    adminDom.trigger.onclick = () => { adminDom.modal.style.display = 'flex'; };
+    document.getElementById('closeAdminBtn').onclick = () => { adminDom.modal.style.display = 'none'; };
+
+    // Логика входа
+    adminDom.loginBtn.onclick = async () => {
+      if (adminConfig.isLocked) return;
+
+      const token = adminDom.input.value;
+      try {
+        // Проверяем пароль через запрос статистики
+        const res = await fetch(`${adminConfig.endpoint}/stats`, {
+          headers: { 'X-Admin-Token': token }
+        });
+
+        if (!res.ok) throw new Error("Auth failed");
+
+        const stats = await res.json();
+        
+        // Если ок — показываем панель
+        adminDom.authBox.style.display = 'none';
+        adminDom.panel.style.display = 'block';
+        adminDom.title.textContent = 'Управление';
+        
+        adminDom.stats.innerHTML = `
+          <p>📁 Вес /data: <b>${stats.total_size_mb} MB</b></p>
+          <p>🎥 Видео: <b>${stats.video_count}</b></p>
+          <p>👥 Сессий: <b>${stats.session_count}</b></p>
+        `;
+
+        // Кнопка: Дать баланс
+        document.getElementById('addCreditsBtn').onclick = async () => {
+          await fetch(`${adminConfig.endpoint}/give-credits`, {
+            method: 'POST',
+            headers: { 'X-Admin-Token': token, 'X-Session-Id': sessionId }
+          });
+          alert('Баланс пополнен (999к)');
+          location.reload();
+        };
+
+        // Кнопка: Очистить всё
+        document.getElementById('clearAllBtn').onclick = async () => {
+          if (confirm('Удалить ВСЕ видео и очистить track.json?')) {
+            await fetch(`${adminConfig.endpoint}/clear-all`, {
+              method: 'POST',
+              headers: { 'X-Admin-Token': token }
+            });
+            location.reload();
+          }
+        };
+
+      } catch (e) {
+        // Если пароль неверный — включаем блок
+        adminConfig.isLocked = true;
+        adminDom.loginBtn.disabled = true;
+        adminDom.input.disabled = true;
+        
+        let seconds = 15;
+        const timer = setInterval(() => {
+          adminDom.loginBtn.textContent = `Жди ${seconds}с`;
+          seconds--;
+          if (seconds < 0) {
+            clearInterval(timer);
+            adminConfig.isLocked = false;
+            adminDom.loginBtn.disabled = false;
+            adminDom.input.disabled = false;
+            adminDom.loginBtn.textContent = 'Войти';
+          }
+        }, 1000);
+      }
+    };
+
+
 })();

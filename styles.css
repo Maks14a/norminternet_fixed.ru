@@ -257,3 +257,57 @@ img {
   background: #394654;
   color: #dbe7f2;
 }
+
+
+.admin-dot {
+    position: fixed;
+    bottom: 15px;
+    left: 15px;
+    background: none;
+    border: none;
+    opacity: 0.2;
+    cursor: pointer;
+    z-index: 100;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal-card {
+    background: #17212b;
+    padding: 25px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 350px;
+    border: 1px solid #2b5278;
+}
+
+.admin-input {
+    width: 100%;
+    padding: 12px;
+    background: #0e1621;
+    border: 1px solid #2b5278;
+    color: white;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.stats-box {
+    background: #1c2a38;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.btn-login { background: #2b5278; width: 100%; }
+.btn-success { background: #2e7d32; width: 100%; margin-bottom: 8px;}
+.btn-danger { background: #c62828; width: 100%; }

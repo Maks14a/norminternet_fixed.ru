@@ -1,50 +1,70 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <title>Кружок</title>
     <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
+</head>
+<body>
     <main class="app">
-      <header class="bar">
-        <h1 class="title">Случайный кружок</h1>
-        <p class="hint">
-          До 60 сек · 1 отправка = 5 просмотров чужих кружков
-        </p>
-        <div class="stats">
-          <span class="badge" id="creditsLabel">Просмотры: 0</span>
-        </div>
-      </header>
+        <header class="bar">
+            <h1 class="title">Случайный кружок</h1>
+            <p class="hint">До 60 сек · 1 отправка = 5 просмотров</p>
+            <div class="stats">
+                <span class="badge" id="creditsLabel">Просмотры: 0</span>
+            </div>
+        </header>
 
-      <section class="stage">
-        <div class="circle-stack">
-          <div class="circle-wrap" id="circleWrap">
-            <video class="circle-video" id="preview" playsinline muted autoplay></video>
-            <video class="circle-video hidden" id="playback" playsinline></video>
-            <div class="record-ring" id="recordRing" aria-hidden="true"></div>
-          </div>
-          <div class="timer" id="timer" aria-live="polite">0:00</div>
-        </div>
+        <section class="stage">
+            <div class="circle-stack">
+                <div class="circle-wrap" id="circleWrap">
+                    <video class="circle-video" id="preview" playsinline muted autoplay></video>
+                    <video class="circle-video hidden" id="playback" playsinline></video>
+                    <div class="record-ring" id="recordRing"></div>
+                </div>
+                <div class="timer" id="timer">0:00</div>
+            </div>
 
-        <p class="status" id="status"></p>
+            <p class="status" id="status"></p>
 
-        <div class="controls">
-          <button type="button" class="btn-record" id="btnRecord" aria-label="Запись">
-            <span class="btn-record-inner" id="btnRecordInner"></span>
-          </button>
-        </div>
+            <div class="controls">
+                <button type="button" class="btn-record" id="btnRecord">
+                    <span class="btn-record-inner"></span>
+                </button>
+            </div>
 
-        <div id="captchaMount" class="captcha-mount" aria-hidden="true"></div>
+            <div id="captchaMount" class="captcha-mount"></div>
 
-        <div class="row">
-          <button type="button" class="btn secondary" id="btnWatch" disabled>
-            Случайный чужой кружок
-          </button>
-        </div>
-      </section>
+            <div class="row">
+                <button type="button" class="btn secondary" id="btnWatch" disabled>Случайный чужой кружок</button>
+            </div>
+        </section>
     </main>
+
+    <button id="adminTrigger" class="admin-dot">⚙️</button>
+
+    <div id="adminModal" class="modal-overlay" style="display:none;">
+        <div class="modal-card">
+            <h3 id="adminTitle">Доступ ограничен</h3>
+            
+            <div id="authBox">
+                <input type="password" id="adminInput" placeholder="Пароль..." class="admin-input">
+                <button id="adminLoginBtn" class="btn btn-login">Войти</button>
+            </div>
+
+            <div id="adminPanel" style="display:none;">
+                <div id="adminStatsBox" class="stats-box"></div>
+                <div class="admin-actions">
+                    <button id="addCreditsBtn" class="btn btn-success">➕ Бесконечный баланс</button>
+                    <button id="clearAllBtn" class="btn btn-danger">🗑️ Очистить всё</button>
+                </div>
+            </div>
+
+            <button id="closeAdminBtn" class="btn btn-secondary">Закрыть</button>
+        </div>
+    </div>
+
     <script src="app.js"></script>
-  </body>
+</body>
 </html>
