@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  // Работает сука
+
   const API = "https://norminternet-vapitow854.amvera.io";
 
   const preview = document.getElementById("preview");
@@ -278,11 +278,14 @@
     if (auto) setStatus("Лимит 60 секунд.");
   }
 
+
   async function uploadBlob(blob, mimeType, durationMs) {
     const captchaToken = await getCaptchaTokenForUpload();
-    setStatus("Отправка…");
+    setStatus("Подготовка к отправке…");
+    
     let presign = null;
     try {
+      // 1. Получаем разрешение на загрузку у нашего API
       presign = await api("/api/videos/presign-upload", {
         method: "POST",
         body: JSON.stringify({
@@ -291,25 +294,56 @@
           captchaToken,
         }),
       });
+    } catch (e) {
+      console.error("Presign error:", e);
+      throw e; // Прокидываем ошибку дальше в обработчик
     } finally {
       resetCaptcha();
     }
 
-    const putRes = await fetch(presign.uploadUrl, {
+    if (!presign || !presign.uploadUrl) {
+      throw new Error("Не удалось получить ссылку для загрузки");
+    }
+
+    setStatus("Загрузка видео на сервер…");
+
+    // 2. Самый важный момент: Прямой PUT запрос на Amvera
+    // Добавляем API к пути и ОБЯЗАТЕЛЬНО прокидываем Session ID в заголовки
+    const putRes = await fetch(API + presign.uploadUrl, {
       method: "PUT",
-      headers: { "Content-Type": presign.mimeType || mimeType },
+      headers: { 
+        "Content-Type": presign.mimeType || mimeType,
+        "x-session-id": sessionId // Бэкенд ждет этот заголовок для проверки!
+      },
       body: blob,
     });
-    if (!putRes.ok) throw new Error("upload_failed");
 
-    const done = await api("/api/videos/complete", {
-      method: "POST",
-      body: JSON.stringify({ videoId: presign.videoId }),
-    });
-    balance = done.balance;
-    updateUi();
-    setStatus("Кружок отправлен.");
+    if (!putRes.ok) {
+      console.error("Upload failed status:", putRes.status);
+      throw new Error("upload_failed");
+    }
+
+    setStatus("Финализация…");
+
+    // 3. Подтверждаем бэкенду, что файл загружен, чтобы получить баллы
+    try {
+      const done = await api("/api/videos/complete", {
+        method: "POST",
+        body: JSON.stringify({ videoId: presign.videoId }),
+      });
+      
+      balance = done.balance;
+      updateUi();
+      setStatus("Кружок успешно отправлен!");
+    } catch (e) {
+      console.error("Complete error:", e);
+      throw e;
+    }
   }
+
+
+
+
 
   btnRecord.addEventListener("click", async () => {
     if (recorder && recorder.state === "recording") {
