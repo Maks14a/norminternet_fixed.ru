@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-
+  // Работает сука
   const API = "https://norminternet-vapitow854.amvera.io";
 
   const preview = document.getElementById("preview");
