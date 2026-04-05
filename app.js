@@ -401,7 +401,7 @@
       updateUi();
       preview.classList.add("hidden");
       playback.classList.remove("hidden");
-      playback.src = data.url;
+      playback.src = API + data.url;
       await playback.play().catch(() => {});
       setStatus("Просмотр");
     } catch (e) {
